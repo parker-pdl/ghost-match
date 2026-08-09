@@ -1,0 +1,3542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<link rel="manifest" href="manifest.json">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
+
+<meta name="theme-color" content="#6a0dad">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ghost Match">
+<meta name="description" content="A fun, family-friendly Halloween ghost matching game.">
+
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+<title>Ghost Match</title>
+
+<style>
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    overflow-x: hidden;
+    font-family:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    background: #090812;
+    color: white;
+}
+
+
+/* =========================================================
+   HAUNTED BACKGROUND
+   Original CSS/SVG-style background
+   ========================================================= */
+
+#gameBackground {
+    position: fixed;
+    inset: 0;
+    z-index: -20;
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            ellipse at 50% 20%,
+            rgba(83, 67, 130, .65),
+            transparent 55%
+        ),
+        linear-gradient(
+            180deg,
+            #171329 0%,
+            #0d1020 45%,
+            #070810 100%
+        );
+}
+
+.moon {
+    position: absolute;
+
+    width: 170px;
+    height: 170px;
+
+    top: 7%;
+    right: 8%;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #ffffff,
+            #e7e6ff 50%,
+            #aaa9c7 100%
+        );
+
+    box-shadow:
+        0 0 35px rgba(240, 240, 255, .55),
+        0 0 90px rgba(180, 180, 255, .25);
+}
+
+.moon::after {
+    content: "";
+
+    position: absolute;
+
+    width: 35px;
+    height: 35px;
+
+    left: 35px;
+    top: 45px;
+
+    border-radius: 50%;
+
+    background: rgba(130, 130, 155, .2);
+
+    box-shadow:
+        55px 35px 0 rgba(130,130,155,.15),
+        20px 80px 0 rgba(130,130,155,.13);
+}
+
+.silhouette {
+    position: absolute;
+
+    bottom: 0;
+    left: 0;
+
+    width: 100%;
+    height: 25%;
+
+    background:
+        linear-gradient(
+            160deg,
+            transparent 0 18%,
+            #05060d 18% 24%,
+            transparent 24% 31%,
+            #05060d 31% 38%,
+            transparent 38% 100%
+        );
+
+    opacity: .7;
+}
+
+
+/* =========================================================
+   CLOUD FOG
+   ========================================================= */
+
+#fog {
+    position: fixed;
+    inset: 0;
+
+    z-index: 30;
+
+    overflow: hidden;
+    pointer-events: none;
+
+    opacity: .65;
+}
+
+.fog-cloud {
+    position: absolute;
+
+    width: 450px;
+    height: 155px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            ellipse at center,
+            rgba(255,255,255,.34) 0%,
+            rgba(225,225,235,.21) 35%,
+            rgba(200,200,215,.08) 62%,
+            transparent 80%
+        );
+
+    filter: blur(18px);
+
+    will-change: transform;
+}
+
+.fog-cloud::before,
+.fog-cloud::after {
+    content: "";
+
+    position: absolute;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.30),
+            rgba(220,220,235,.12) 55%,
+            transparent 75%
+        );
+
+    filter: blur(12px);
+}
+
+.fog-cloud::before {
+    width: 190px;
+    height: 130px;
+
+    left: 45px;
+    top: -55px;
+}
+
+.fog-cloud::after {
+    width: 220px;
+    height: 145px;
+
+    right: 35px;
+    top: -65px;
+}
+
+.cloud-1 {
+    top: 12%;
+    animation: fog1 38s linear infinite;
+}
+
+.cloud-2 {
+    top: 33%;
+    width: 560px;
+    opacity: .55;
+    animation: fog2 48s linear infinite;
+}
+
+.cloud-3 {
+    top: 53%;
+    width: 390px;
+    opacity: .48;
+    animation: fog3 42s linear infinite;
+}
+
+.cloud-4 {
+    top: 72%;
+    width: 620px;
+    opacity: .38;
+    animation: fog4 55s linear infinite;
+}
+
+.cloud-5 {
+    top: 87%;
+    width: 450px;
+    opacity: .45;
+    animation: fog5 46s linear infinite;
+}
+
+@keyframes fog1 {
+    from {
+        transform: translateX(-600px) translateY(15px) scale(.9);
+    }
+
+    50% {
+        transform: translateX(50vw) translateY(-10px) scale(1.08);
+    }
+
+    to {
+        transform: translateX(calc(100vw + 600px)) translateY(12px) scale(.95);
+    }
+}
+
+@keyframes fog2 {
+    from {
+        transform: translateX(-650px);
+    }
+
+    50% {
+        transform: translateX(45vw) translateY(20px) scale(.88);
+    }
+
+    to {
+        transform: translateX(calc(100vw + 650px)) translateY(-10px) scale(1.05);
+    }
+}
+
+@keyframes fog3 {
+    from {
+        transform: translateX(-500px) scale(.85);
+    }
+
+    50% {
+        transform: translateX(55vw) translateY(15px) scale(1.12);
+    }
+
+    to {
+        transform: translateX(calc(100vw + 500px)) translateY(-8px) scale(.9);
+    }
+}
+
+@keyframes fog4 {
+    from {
+        transform: translateX(-700px) scale(1.05);
+    }
+
+    50% {
+        transform: translateX(40vw) translateY(-15px) scale(.92);
+    }
+
+    to {
+        transform: translateX(calc(100vw + 700px)) translateY(8px) scale(1.08);
+    }
+}
+
+@keyframes fog5 {
+    from {
+        transform: translateX(-550px) scale(.92);
+    }
+
+    50% {
+        transform: translateX(60vw) translateY(-12px) scale(1.08);
+    }
+
+    to {
+        transform: translateX(calc(100vw + 550px)) translateY(10px) scale(.95);
+    }
+}
+
+
+/* =========================================================
+   LIGHTNING
+   ========================================================= */
+
+#lightning {
+    position: fixed;
+    inset: 0;
+
+    z-index: 80;
+
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            ellipse at 50% 30%,
+            rgba(255,255,255,1) 0%,
+            rgba(235,240,255,.95) 35%,
+            rgba(190,210,255,.55) 65%,
+            rgba(255,255,255,0) 100%
+        );
+
+    opacity: 0;
+}
+
+#lightning.flash {
+    animation: lightningFlash .42s ease-out;
+}
+
+@keyframes lightningFlash {
+    0% { opacity: 0; }
+    7% { opacity: 1; }
+    12% { opacity: .15; }
+    19% { opacity: .95; }
+    27% { opacity: .05; }
+    38% { opacity: .75; }
+    52% { opacity: .18; }
+    100% { opacity: 0; }
+}
+
+
+/* =========================================================
+   MAIN APP
+   ========================================================= */
+
+#app {
+    position: relative;
+
+    width: 100%;
+    min-height: 100vh;
+
+    padding:
+        18px
+        12px
+        30px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header {
+    width: min(650px, 100%);
+
+    text-align: center;
+
+    margin-bottom: 12px;
+}
+
+.logo {
+    margin: 0;
+
+    font-size:
+        clamp(30px, 8vw, 55px);
+
+    font-weight: 1000;
+
+    letter-spacing: 2px;
+
+    text-shadow:
+        0 4px 0 #090812,
+        0 0 20px rgba(190,170,255,.55);
+}
+
+.tagline {
+    margin: 2px 0 12px;
+
+    font-size: 14px;
+
+    opacity: .8;
+}
+
+
+/* =========================================================
+   SCORE BAR
+   ========================================================= */
+
+.stats {
+    width: min(650px, 100%);
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 8px;
+
+    margin-bottom: 12px;
+}
+
+.stat {
+    padding: 10px 6px;
+
+    text-align: center;
+
+    border-radius: 15px;
+
+    background:
+        rgba(15,13,29,.78);
+
+    border:
+        1px solid rgba(255,255,255,.13);
+
+    box-shadow:
+        0 5px 20px rgba(0,0,0,.22);
+}
+
+.stat-label {
+    display: block;
+
+    font-size: 10px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    opacity: .65;
+}
+
+.stat-value {
+    display: block;
+
+    margin-top: 2px;
+
+    font-size: 22px;
+
+    font-weight: 900;
+}
+
+
+/* =========================================================
+   GAME BOARD
+   ========================================================= */
+
+#board {
+    position: relative;
+
+    width: min(650px, 96vw);
+    aspect-ratio: 1 / 1;
+
+    padding: 7px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(8, 1fr);
+
+    grid-template-rows:
+        repeat(8, 1fr);
+
+    gap: 5px;
+
+    border-radius: 24px;
+
+    background:
+        rgba(8,7,18,.88);
+
+    border:
+        3px solid rgba(255,255,255,.18);
+
+    box-shadow:
+        0 20px 70px rgba(0,0,0,.55),
+        inset 0 0 25px rgba(130,100,200,.14);
+
+    touch-action: manipulation;
+}
+
+
+/* =========================================================
+   TILES
+   ========================================================= */
+
+.tile {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 15px;
+
+    background:
+        rgba(255,255,255,.045);
+
+    cursor: pointer;
+
+    user-select: none;
+
+    transition:
+        transform .13s ease,
+        filter .13s ease,
+        box-shadow .13s ease;
+
+    overflow: hidden;
+}
+
+.tile::after {
+    content: "";
+
+    position: absolute;
+
+    inset: 5%;
+
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.14),
+            transparent 42%
+        );
+
+    pointer-events: none;
+}
+
+.tile:hover {
+    transform: scale(.96);
+}
+
+.tile.selected {
+    transform: scale(.90);
+
+    box-shadow:
+        0 0 0 4px white,
+        0 0 22px rgba(255,255,255,.75);
+
+    z-index: 5;
+}
+
+.tile.matched {
+    animation:
+        ghostPop .25s ease forwards;
+}
+
+@keyframes ghostPop {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    60% {
+        transform: scale(1.25);
+        opacity: .9;
+    }
+
+    100% {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+
+/* =========================================================
+   GHOSTS
+   Shape AND color are intentionally different.
+   ========================================================= */
+
+.ghost {
+    position: relative;
+
+    width: 70%;
+    height: 72%;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    filter:
+        drop-shadow(
+            0 4px 3px rgba(0,0,0,.3)
+        );
+}
+
+
+/* Ghost body */
+
+.ghost-body {
+    position: absolute;
+
+    inset: 0;
+
+    background: var(--ghost-color);
+
+    box-shadow:
+        inset -5px -7px 0 rgba(0,0,0,.12),
+        inset 4px 4px 0 rgba(255,255,255,.2);
+}
+
+
+/* Ghost face */
+
+.eyes {
+    position: absolute;
+
+    width: 12%;
+    height: 17%;
+
+    top: 30%;
+
+    border-radius: 50%;
+
+    background: #101018;
+
+    box-shadow:
+        17px 0 0 #101018;
+}
+
+.mouth {
+    position: absolute;
+
+    width: 22%;
+    height: 18%;
+
+    top: 54%;
+
+    border-radius:
+        50%
+        50%
+        45%
+        45%;
+
+    background: #101018;
+}
+
+
+/* =========================================================
+   GHOST SHAPES
+   ========================================================= */
+
+/* Classic */
+.shape-0 .ghost-body {
+    border-radius:
+        50% 50% 18% 18%;
+
+    clip-path:
+        polygon(
+            0 100%,
+            0 28%,
+            7% 13%,
+            22% 3%,
+            50% 0,
+            78% 3%,
+            93% 13%,
+            100% 28%,
+            100% 100%,
+            82% 82%,
+            66% 100%,
+            50% 82%,
+            34% 100%,
+            18% 82%
+        );
+}
+
+
+/* Round */
+.shape-1 .ghost-body {
+    border-radius: 50% 50% 35% 35%;
+
+    clip-path:
+        polygon(
+            0 100%,
+            0 30%,
+            12% 10%,
+            35% 0,
+            65% 0,
+            88% 10%,
+            100% 30%,
+            100% 100%,
+            80% 88%,
+            65% 100%,
+            50% 88%,
+            35% 100%,
+            20% 88%
+        );
+}
+
+
+/* Pointed */
+.shape-2 .ghost-body {
+    border-radius: 45% 45% 10% 10%;
+
+    clip-path:
+        polygon(
+            0 100%,
+            0 25%,
+            12% 8%,
+            50% 0,
+            88% 8%,
+            100% 25%,
+            100% 100%,
+            78% 72%,
+            62% 100%,
+            48% 72%,
+            31% 100%,
+            17% 72%
+        );
+}
+
+
+/* Wide */
+.shape-3 .ghost-body {
+    border-radius: 60% 60% 15% 15%;
+
+    clip-path:
+        polygon(
+            0 100%,
+            0 35%,
+            8% 15%,
+            25% 3%,
+            75% 3%,
+            92% 15%,
+            100% 35%,
+            100% 100%,
+            75% 87%,
+            55% 100%,
+            35% 87%,
+            20% 100%
+        );
+}
+
+
+/* Tall */
+.shape-4 .ghost-body {
+    border-radius: 50% 50% 20% 20%;
+
+    clip-path:
+        polygon(
+            0 100%,
+            0 25%,
+            10% 9%,
+            30% 0,
+            70% 0,
+            90% 9%,
+            100% 25%,
+            100% 100%,
+            80% 88%,
+            66% 100%,
+            50% 84%,
+            34% 100%,
+            20% 88%
+        );
+}
+
+
+/* Diamond */
+.shape-5 .ghost-body {
+    border-radius: 25% 25% 30% 30%;
+
+    clip-path:
+        polygon(
+            0 100%,
+            0 30%,
+            20% 8%,
+            50% 0,
+            80% 8%,
+            100% 30%,
+            100% 100%,
+            76% 82%,
+            60% 100%,
+            42% 82%,
+            24% 100%
+        );
+}
+
+
+/* =========================================================
+   GHOST COLORS
+   Strongly separated colors for accessibility.
+   ========================================================= */
+
+.color-0 {
+    --ghost-color: #ffffff;
+}
+
+.color-1 {
+    --ghost-color: #17171d;
+}
+
+.color-2 {
+    --ghost-color: #ff9f1c;
+}
+
+.color-3 {
+    --ghost-color: #45d9ff;
+}
+
+.color-4 {
+    --ghost-color: #d85cff;
+}
+
+.color-5 {
+    --ghost-color: #62e36d;
+}
+
+
+/* =========================================================
+   CONTROLS
+   ========================================================= */
+
+.controls {
+    width: min(650px, 100%);
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    margin-top: 14px;
+
+    flex-wrap: wrap;
+}
+
+button {
+    font: inherit;
+}
+
+.control-button {
+    border: 0;
+
+    border-radius: 14px;
+
+    padding: 12px 18px;
+
+    color: white;
+
+    background:
+        rgba(25,22,42,.9);
+
+    border:
+        1px solid rgba(255,255,255,.15);
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition:
+        transform .15s ease,
+        background .15s ease;
+}
+
+.control-button:hover {
+    transform: translateY(-2px);
+
+    background:
+        rgba(55,48,80,.95);
+}
+
+.control-button:active {
+    transform: scale(.96);
+}
+
+
+/* =========================================================
+   INSTRUCTIONS
+   ========================================================= */
+
+.instructions {
+    width: min(650px, 100%);
+
+    margin-top: 12px;
+
+    padding: 12px 16px;
+
+    text-align: center;
+
+    border-radius: 15px;
+
+    background:
+        rgba(10,9,22,.65);
+
+    border:
+        1px solid rgba(255,255,255,.1);
+
+    font-size: 13px;
+
+    line-height: 1.45;
+
+    opacity: .82;
+}
+
+
+/* =========================================================
+   JUMP SCARE
+   ========================================================= */
+
+#jumpscare {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 200;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    pointer-events: none;
+
+    opacity: 0;
+}
+
+#jumpscare.show {
+    animation:
+        jumpscareFlash .72s ease-out forwards;
+}
+
+.jumpscare-ghost {
+    position: relative;
+
+    width: min(330px, 72vw);
+    height: min(330px, 72vw);
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #d7d7e5
+        );
+
+    clip-path:
+        polygon(
+            0 100%,
+            0 40%,
+            5% 23%,
+            18% 10%,
+            34% 3%,
+            50% 0,
+            66% 3%,
+            82% 10%,
+            95% 23%,
+            100% 40%,
+            100% 100%,
+            82% 82%,
+            66% 100%,
+            50% 82%,
+            34% 100%,
+            18% 82%
+        );
+
+    filter:
+        drop-shadow(
+            0 0 30px
+            rgba(255,255,255,.95)
+        );
+}
+
+.jumpscare-eye {
+    position: absolute;
+
+    width: 21%;
+    height: 29%;
+
+    top: 28%;
+
+    border-radius: 50%;
+
+    background: #050505;
+}
+
+.jumpscare-eye.left {
+    left: 20%;
+}
+
+.jumpscare-eye.right {
+    right: 20%;
+}
+
+.jumpscare-mouth {
+    position: absolute;
+
+    width: 48%;
+    height: 25%;
+
+    left: 26%;
+    top: 58%;
+
+    background: #050505;
+
+    border-radius:
+        10%
+        10%
+        50%
+        50%;
+}
+
+.jumpscare-mouth::before {
+    content: "";
+
+    position: absolute;
+
+    left: 10%;
+    right: 10%;
+    top: 8%;
+
+    height: 15%;
+
+    background: white;
+
+    box-shadow:
+        0 17px 0 white,
+        0 34px 0 white;
+}
+
+@keyframes jumpscareFlash {
+    0% {
+        opacity: 0;
+        transform: scale(.15);
+    }
+
+    8% {
+        opacity: 1;
+        transform: scale(1.18);
+    }
+
+    15% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    32% {
+        opacity: 1;
+        transform: scale(1.03);
+    }
+
+    55% {
+        opacity: .9;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(.96);
+    }
+}
+
+
+/* =========================================================
+   WIN SCREEN
+   ========================================================= */
+
+#winOverlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 500;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background:
+        rgba(8,5,20,.84);
+
+    backdrop-filter:
+        blur(7px);
+
+    -webkit-backdrop-filter:
+        blur(7px);
+}
+
+#winOverlay.show {
+    display: flex;
+
+    animation:
+        winOverlayIn .45s ease-out;
+}
+
+#winCard {
+    width: min(520px, 92vw);
+
+    padding: 34px 25px 30px;
+
+    text-align: center;
+
+    border-radius: 30px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #eeeeff
+        );
+
+    border:
+        5px solid rgba(255,255,255,.9);
+
+    box-shadow:
+        0 0 0 5px rgba(150,100,255,.25),
+        0 20px 70px rgba(0,0,0,.55),
+        0 0 45px rgba(210,180,255,.65);
+
+    animation:
+        winCardPop .55s
+        cubic-bezier(.17,1.4,.45,1)
+        forwards;
+}
+
+.winGhosts {
+    font-size:
+        clamp(42px,10vw,70px);
+
+    letter-spacing: 8px;
+
+    animation:
+        ghostBounce 1.2s ease-in-out infinite;
+}
+
+.winStars {
+    font-size:
+        clamp(22px,6vw,36px);
+
+    letter-spacing: 5px;
+
+    animation:
+        starTwinkle 1s ease-in-out infinite alternate;
+}
+
+#winTitle {
+    margin: 5px 0 0;
+
+    font-size:
+        clamp(48px,13vw,78px);
+
+    line-height: .95;
+
+    font-weight: 1000;
+
+    letter-spacing: 2px;
+
+    color: #171322;
+
+    text-shadow:
+        3px 3px 0 #d7c9ff;
+}
+
+#winSubtitle {
+    margin: 10px 0 6px;
+
+    font-size:
+        clamp(25px,7vw,38px);
+
+    color: #6b42c9;
+}
+
+#winMessage {
+    margin: 5px auto 18px;
+
+    max-width: 390px;
+
+    font-size: 19px;
+
+    line-height: 1.4;
+
+    color: #403a4d;
+}
+
+#winBadge {
+    display: inline-block;
+
+    padding: 9px 18px;
+
+    margin: 5px 0 15px;
+
+    border-radius: 999px;
+
+    background: #191525;
+
+    color: white;
+
+    font-weight: 900;
+
+    letter-spacing: 1px;
+}
+
+#winScore {
+    margin-bottom: 20px;
+
+    font-size: 18px;
+
+    color: #4d4658;
+}
+
+.winButtons {
+    display: flex;
+
+    gap: 12px;
+
+    justify-content: center;
+
+    flex-wrap: wrap;
+}
+
+.winButtons button {
+    border: 0;
+
+    border-radius: 15px;
+
+    padding: 14px 22px;
+
+    min-width: 150px;
+
+    font-size: 16px;
+
+    font-weight: 900;
+
+    cursor: pointer;
+
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease;
+}
+
+.winButtons button:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 7px 18px rgba(0,0,0,.22);
+}
+
+#continueButton {
+    background: #191525;
+    color: white;
+}
+
+#newGameButton {
+    background: #ded4ff;
+    color: #241a38;
+}
+
+@keyframes winOverlayIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes winCardPop {
+    0% {
+        transform: scale(.65) rotate(-3deg);
+    }
+
+    70% {
+        transform: scale(1.04) rotate(1deg);
+    }
+
+    100% {
+        transform: scale(1) rotate(0);
+    }
+}
+
+@keyframes ghostBounce {
+    0%,100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+@keyframes starTwinkle {
+    from {
+        transform: scale(.95);
+        opacity: .7;
+    }
+
+    to {
+        transform: scale(1.08);
+        opacity: 1;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    #app {
+        padding-top: 10px;
+    }
+
+    .logo {
+        font-size: 32px;
+    }
+
+    #board {
+        gap: 3px;
+        padding: 5px;
+        border-radius: 18px;
+    }
+
+    .tile {
+        border-radius: 10px;
+    }
+
+    .fog-cloud {
+        filter: blur(14px);
+    }
+
+    #fog {
+        opacity: .55;
+    }
+
+    .moon {
+        width: 100px;
+        height: 100px;
+    }
+
+    .winButtons {
+        flex-direction: column;
+    }
+
+    .winButtons button {
+        width: 100%;
+    }
+}
+
+</style>
+</head>
+
+
+<body>
+
+<!-- =====================================================
+     BACKGROUND
+     ===================================================== -->
+
+<div id="gameBackground">
+
+    <div class="moon"></div>
+
+    <div class="silhouette"></div>
+
+</div>
+
+
+<!-- =====================================================
+     FOG
+     ===================================================== -->
+
+<div id="fog">
+
+    <div class="fog-cloud cloud-1"></div>
+    <div class="fog-cloud cloud-2"></div>
+    <div class="fog-cloud cloud-3"></div>
+    <div class="fog-cloud cloud-4"></div>
+    <div class="fog-cloud cloud-5"></div>
+
+</div>
+
+
+<!-- =====================================================
+     LIGHTNING
+     ===================================================== -->
+
+<div id="lightning"></div>
+
+
+<!-- =====================================================
+     JUMP SCARE
+     ===================================================== -->
+
+<div id="jumpscare">
+
+    <div class="jumpscare-ghost">
+
+        <div class="jumpscare-eye left"></div>
+        <div class="jumpscare-eye right"></div>
+
+        <div class="jumpscare-mouth"></div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MAIN GAME
+     ===================================================== -->
+
+<main id="app">
+
+    <header class="header">
+
+        <h1 class="logo">
+            👻 Ghost Match
+        </h1>
+
+        <p class="tagline">
+            Match the ghosts • Make connections • Have fun!
+        </p>
+
+    </header>
+
+
+    <!-- SCORE -->
+
+    <section class="stats">
+
+        <div class="stat">
+
+            <span class="stat-label">
+                Score
+            </span>
+
+            <span
+                class="stat-value"
+                id="score">
+                0
+            </span>
+
+        </div>
+
+        <div class="stat">
+
+            <span class="stat-label">
+                Connections
+            </span>
+
+            <span
+                class="stat-value"
+                id="connections">
+                0
+            </span>
+
+        </div>
+
+        <div class="stat">
+
+            <span class="stat-label">
+                Best
+            </span>
+
+            <span
+                class="stat-value"
+                id="best">
+                0
+            </span>
+
+        </div>
+
+    </section>
+
+
+    <!-- BOARD -->
+
+    <div
+        id="board"
+        aria-label="Ghost matching game board">
+    </div>
+
+
+    <!-- CONTROLS -->
+
+    <div class="controls">
+
+        <button
+            class="control-button"
+            id="newGame"
+            type="button">
+            🔄 New Game
+        </button>
+
+        <button
+            class="control-button"
+            id="soundButton"
+            type="button">
+            🔊 Sound On
+        </button>
+
+        <button
+            class="control-button"
+            id="musicButton"
+            type="button">
+            🎵 Music On
+        </button>
+
+    </div>
+
+
+    <!-- INSTRUCTIONS -->
+
+    <div class="instructions">
+
+        Match <strong>3 or more</strong> ghosts in a row,
+        column, or group.
+        <br>
+
+        The ghosts have different
+        <strong>colors AND shapes</strong>
+        to make them easier to tell apart.
+
+        <br><br>
+
+        🏆 <strong>10 connections</strong> =
+        Ghost Master!
+
+        &nbsp;&nbsp;
+
+        ⭐ <strong>15 connections</strong> =
+        Pro Ghost Master!
+
+    </div>
+
+</main>
+
+
+<!-- =====================================================
+     WIN OVERLAY
+     ===================================================== -->
+
+<div id="winOverlay">
+
+    <div id="winCard">
+
+        <div class="winGhosts">
+            👻 ✨ 👻
+        </div>
+
+        <div class="winStars">
+            ★ ★ ★ ★ ★
+        </div>
+
+        <h1 id="winTitle">
+            YOU WIN!
+        </h1>
+
+        <h2 id="winSubtitle">
+            Amazing Job!
+        </h2>
+
+        <p id="winMessage">
+            You made 10 ghost connections!
+        </p>
+
+        <div id="winBadge">
+            👻 GHOST MASTER 👻
+        </div>
+
+        <div id="winScore">
+            Connections:
+            <strong id="finalConnections">
+                10
+            </strong>
+        </div>
+
+        <div class="winButtons">
+
+            <button
+                id="continueButton"
+                type="button">
+                KEEP PLAYING
+            </button>
+
+            <button
+                id="newGameButton"
+                type="button">
+                PLAY AGAIN
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   GAME SETTINGS
+   ========================================================= */
+
+const ROWS = 8;
+const COLS = 8;
+
+const KID_WIN_GOAL = 10;
+const PRO_WIN_GOAL = 15;
+
+
+/* =========================================================
+   GAME STATE
+   ========================================================= */
+
+let board = [];
+
+let selected = null;
+
+let score = 0;
+let connections = 0;
+
+let best = Number(
+    localStorage.getItem("ghostBest") || 0
+);
+
+let busy = false;
+let paused = false;
+
+let soundEnabled = true;
+let musicEnabled = true;
+
+let kidWinShown = false;
+let proWinShown = false;
+
+let audioContext = null;
+
+let musicTimer = null;
+
+
+/* =========================================================
+   GHOST TYPES
+   ========================================================= */
+
+const GHOST_TYPES = [
+
+    {
+        color: 0,
+        shape: 0,
+        name: "White Classic"
+    },
+
+    {
+        color: 1,
+        shape: 1,
+        name: "Black Round"
+    },
+
+    {
+        color: 2,
+        shape: 2,
+        name: "Orange Point"
+    },
+
+    {
+        color: 3,
+        shape: 3,
+        name: "Blue Wide"
+    },
+
+    {
+        color: 4,
+        shape: 4,
+        name: "Purple Tall"
+    },
+
+    {
+        color: 5,
+        shape: 5,
+        name: "Green Diamond"
+    }
+
+];
+
+
+/* =========================================================
+   DOM
+   ========================================================= */
+
+const boardElement =
+    document.getElementById("board");
+
+const scoreElement =
+    document.getElementById("score");
+
+const connectionsElement =
+    document.getElementById("connections");
+
+const bestElement =
+    document.getElementById("best");
+
+const newGameButton =
+    document.getElementById("newGame");
+
+const soundButton =
+    document.getElementById("soundButton");
+
+const musicButton =
+    document.getElementById("musicButton");
+
+const lightning =
+    document.getElementById("lightning");
+
+const jumpscare =
+    document.getElementById("jumpscare");
+
+const winOverlay =
+    document.getElementById("winOverlay");
+
+const finalConnections =
+    document.getElementById("finalConnections");
+
+const winTitle =
+    document.getElementById("winTitle");
+
+const winSubtitle =
+    document.getElementById("winSubtitle");
+
+const winMessage =
+    document.getElementById("winMessage");
+
+const winBadge =
+    document.getElementById("winBadge");
+
+const continueButton =
+    document.getElementById("continueButton");
+
+const newGameWinButton =
+    document.getElementById("newGameButton");
+
+
+/* =========================================================
+   AUDIO
+   Original procedural spooky sounds.
+   No external copyrighted music file required.
+   ========================================================= */
+
+function getAudioContext() {
+
+    if (!audioContext) {
+
+        const AudioContext =
+            window.AudioContext ||
+            window.webkitAudioContext;
+
+        if (!AudioContext) {
+            return null;
+        }
+
+        audioContext =
+            new AudioContext();
+    }
+
+    if (
+        audioContext.state ===
+        "suspended"
+    ) {
+        audioContext.resume();
+    }
+
+    return audioContext;
+}
+
+
+/* =========================================================
+   SOUND EFFECT
+   ========================================================= */
+
+function playTone(
+    frequency,
+    duration = .12,
+    type = "sine",
+    volume = .08
+) {
+
+    if (!soundEnabled) {
+        return;
+    }
+
+    const ctx =
+        getAudioContext();
+
+    if (!ctx) {
+        return;
+    }
+
+    const now =
+        ctx.currentTime;
+
+    const oscillator =
+        ctx.createOscillator();
+
+    const gain =
+        ctx.createGain();
+
+    oscillator.type =
+        type;
+
+    oscillator.frequency.setValueAtTime(
+        frequency,
+        now
+    );
+
+    gain.gain.setValueAtTime(
+        .0001,
+        now
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        volume,
+        now + .015
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .0001,
+        now + duration
+    );
+
+    oscillator
+        .connect(gain)
+        .connect(ctx.destination);
+
+    oscillator.start(now);
+
+    oscillator.stop(
+        now + duration + .02
+    );
+}
+
+
+/* =========================================================
+   MATCH SOUND
+   ========================================================= */
+
+function playMatchSound(count) {
+
+    if (!soundEnabled) {
+        return;
+    }
+
+    const notes = [
+        330,
+        392,
+        494,
+        587
+    ];
+
+    playTone(
+        notes[
+            Math.min(
+                count - 3,
+                notes.length - 1
+            )
+        ],
+        .16,
+        "triangle",
+        .09
+    );
+}
+
+
+/* =========================================================
+   WIN SOUND
+   ========================================================= */
+
+function playWinSound() {
+
+    if (!soundEnabled) {
+        return;
+    }
+
+    const ctx =
+        getAudioContext();
+
+    if (!ctx) {
+        return;
+    }
+
+    const notes = [
+        523.25,
+        659.25,
+        783.99,
+        1046.50
+    ];
+
+    notes.forEach(
+        (frequency, index) => {
+
+            const start =
+                ctx.currentTime +
+                index * .12;
+
+            const oscillator =
+                ctx.createOscillator();
+
+            const gain =
+                ctx.createGain();
+
+            oscillator.type =
+                "sine";
+
+            oscillator.frequency.value =
+                frequency;
+
+            gain.gain.setValueAtTime(
+                .0001,
+                start
+            );
+
+            gain.gain.exponentialRampToValueAtTime(
+                .12,
+                start + .025
+            );
+
+            gain.gain.exponentialRampToValueAtTime(
+                .0001,
+                start + .45
+            );
+
+            oscillator
+                .connect(gain)
+                .connect(ctx.destination);
+
+            oscillator.start(start);
+
+            oscillator.stop(
+                start + .5
+            );
+        }
+    );
+}
+
+
+/* =========================================================
+   HALLOWEEN MUSIC
+   Procedurally generated original spooky melody.
+   ========================================================= */
+
+const spookyNotes = [
+    196,
+    233,
+    261,
+    196,
+    174,
+    233,
+    220,
+    196,
+    155,
+    196,
+    233,
+    174
+];
+
+let musicIndex = 0;
+
+function playMusicNote() {
+
+    if (
+        !musicEnabled ||
+        !audioContext
+    ) {
+        return;
+    }
+
+    const ctx =
+        getAudioContext();
+
+    if (!ctx) {
+        return;
+    }
+
+    const frequency =
+        spookyNotes[
+            musicIndex %
+            spookyNotes.length
+        ];
+
+    musicIndex++;
+
+    const now =
+        ctx.currentTime;
+
+    const oscillator =
+        ctx.createOscillator();
+
+    const gain =
+        ctx.createGain();
+
+    oscillator.type =
+        "triangle";
+
+    oscillator.frequency.setValueAtTime(
+        frequency,
+        now
+    );
+
+    oscillator.detune.setValueAtTime(
+        musicIndex % 4 === 0
+            ? -12
+            : 0,
+        now
+    );
+
+    gain.gain.setValueAtTime(
+        .0001,
+        now
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .025,
+        now + .08
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .0001,
+        now + .75
+    );
+
+    oscillator
+        .connect(gain)
+        .connect(ctx.destination);
+
+    oscillator.start(now);
+
+    oscillator.stop(
+        now + .8
+    );
+}
+
+
+function startMusic() {
+
+    if (!musicEnabled) {
+        return;
+    }
+
+    if (musicTimer) {
+        clearInterval(
+            musicTimer
+        );
+    }
+
+    getAudioContext();
+
+    musicTimer =
+        setInterval(
+            playMusicNote,
+            700
+        );
+
+    playMusicNote();
+}
+
+
+function stopMusic() {
+
+    if (musicTimer) {
+
+        clearInterval(
+            musicTimer
+        );
+
+        musicTimer = null;
+    }
+}
+
+
+/* =========================================================
+   THUNDER
+   ========================================================= */
+
+function playThunder() {
+
+    if (!soundEnabled) {
+        return;
+    }
+
+    const ctx =
+        getAudioContext();
+
+    if (!ctx) {
+        return;
+    }
+
+    const now =
+        ctx.currentTime;
+
+    const oscillator =
+        ctx.createOscillator();
+
+    const gain =
+        ctx.createGain();
+
+    oscillator.type =
+        "sawtooth";
+
+    oscillator.frequency.setValueAtTime(
+        65,
+        now
+    );
+
+    oscillator.frequency.exponentialRampToValueAtTime(
+        28,
+        now + 1.1
+    );
+
+    gain.gain.setValueAtTime(
+        .0001,
+        now
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .16,
+        now + .06
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .0001,
+        now + 1.15
+    );
+
+    oscillator
+        .connect(gain)
+        .connect(ctx.destination);
+
+    oscillator.start(now);
+
+    oscillator.stop(
+        now + 1.2
+    );
+}
+
+
+/* =========================================================
+   LIGHTNING
+   ========================================================= */
+
+function lightningStrike() {
+
+    if (paused) {
+        return;
+    }
+
+    lightning.classList.remove(
+        "flash"
+    );
+
+    void lightning.offsetWidth;
+
+    lightning.classList.add(
+        "flash"
+    );
+
+    setTimeout(
+        playThunder,
+        120 + Math.random() * 250
+    );
+}
+
+
+function scheduleLightning() {
+
+    const delay =
+        12000 +
+        Math.random() * 25000;
+
+    setTimeout(
+        () => {
+
+            lightningStrike();
+
+            scheduleLightning();
+
+        },
+        delay
+    );
+}
+
+
+/* =========================================================
+   JUMP SCARE
+   ========================================================= */
+
+function playJumpscareSound() {
+
+    if (!soundEnabled) {
+        return;
+    }
+
+    const ctx =
+        getAudioContext();
+
+    if (!ctx) {
+        return;
+    }
+
+    const now =
+        ctx.currentTime;
+
+
+    const oscillator =
+        ctx.createOscillator();
+
+    const gain =
+        ctx.createGain();
+
+    oscillator.type =
+        "sawtooth";
+
+    oscillator.frequency.setValueAtTime(
+        900,
+        now
+    );
+
+    oscillator.frequency.exponentialRampToValueAtTime(
+        110,
+        now + .42
+    );
+
+    gain.gain.setValueAtTime(
+        .0001,
+        now
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .16,
+        now + .025
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .0001,
+        now + .48
+    );
+
+    oscillator
+        .connect(gain)
+        .connect(ctx.destination);
+
+    oscillator.start(now);
+
+    oscillator.stop(
+        now + .5
+    );
+
+
+    const growl =
+        ctx.createOscillator();
+
+    const growlGain =
+        ctx.createGain();
+
+    growl.type =
+        "triangle";
+
+    growl.frequency.setValueAtTime(
+        90,
+        now
+    );
+
+    growl.frequency.exponentialRampToValueAtTime(
+        42,
+        now + .7
+    );
+
+    growlGain.gain.setValueAtTime(
+        .0001,
+        now
+    );
+
+    growlGain.gain.exponentialRampToValueAtTime(
+        .09,
+        now + .08
+    );
+
+    growlGain.gain.exponentialRampToValueAtTime(
+        .0001,
+        now + .75
+    );
+
+    growl
+        .connect(growlGain)
+        .connect(ctx.destination);
+
+    growl.start(now);
+
+    growl.stop(
+        now + .8
+    );
+}
+
+
+function triggerJumpscare() {
+
+    if (
+        paused ||
+        busy
+    ) {
+        return;
+    }
+
+    jumpscare.classList.remove(
+        "show"
+    );
+
+    void jumpscare.offsetWidth;
+
+    jumpscare.classList.add(
+        "show"
+    );
+
+    playJumpscareSound();
+
+    setTimeout(
+        () => {
+
+            jumpscare.classList.remove(
+                "show"
+            );
+
+        },
+        800
+    );
+}
+
+
+function scheduleJumpscare() {
+
+    const delay =
+        25000 +
+        Math.random() * 35000;
+
+    setTimeout(
+        () => {
+
+            if (
+                !paused &&
+                Math.random() < .60
+            ) {
+                triggerJumpscare();
+            }
+
+            scheduleJumpscare();
+
+        },
+        delay
+    );
+}
+
+
+/* =========================================================
+   CREATE GHOST
+   ========================================================= */
+
+function createGhost(
+    color,
+    shape
+) {
+
+    const ghost =
+        document.createElement("div");
+
+    ghost.className =
+        `ghost color-${color} shape-${shape}`;
+
+    const body =
+        document.createElement("div");
+
+    body.className =
+        "ghost-body";
+
+    const eyes =
+        document.createElement("div");
+
+    eyes.className =
+        "eyes";
+
+    const mouth =
+        document.createElement("div");
+
+    mouth.className =
+        "mouth";
+
+    ghost.appendChild(body);
+    ghost.appendChild(eyes);
+    ghost.appendChild(mouth);
+
+    return ghost;
+}
+
+
+/* =========================================================
+   BOARD GENERATION
+   Prevents adjacent identical colors AND shapes.
+   ========================================================= */
+
+function getAllowedTypes(
+    row,
+    col
+) {
+
+    return GHOST_TYPES.filter(
+        type => {
+
+            const left =
+                col > 0
+                    ? board[row][col - 1]
+                    : null;
+
+            const above =
+                row > 0
+                    ? board[row - 1][col]
+                    : null;
+
+
+            if (
+                left &&
+                left.color === type.color
+            ) {
+                return false;
+            }
+
+            if (
+                above &&
+                above.color === type.color
+            ) {
+                return false;
+            }
+
+
+            if (
+                left &&
+                left.shape === type.shape
+            ) {
+                return false;
+            }
+
+            if (
+                above &&
+                above.shape === type.shape
+            ) {
+                return false;
+            }
+
+
+            return true;
+        }
+    );
+}
+
+
+function generateBoard() {
+
+    board = [];
+
+    for (
+        let row = 0;
+        row < ROWS;
+        row++
+    ) {
+
+        board[row] = [];
+
+        for (
+            let col = 0;
+            col < COLS;
+            col++
+        ) {
+
+            let choices =
+                getAllowedTypes(
+                    row,
+                    col
+                );
+
+            if (!choices.length) {
+                choices =
+                    GHOST_TYPES;
+            }
+
+            const type =
+                choices[
+                    Math.floor(
+                        Math.random() *
+                        choices.length
+                    )
+                ];
+
+            board[row][col] = {
+                color: type.color,
+                shape: type.shape
+            };
+        }
+    }
+
+    /*
+     * Remove any accidental matches.
+     */
+
+    let matches =
+        findMatches();
+
+    let safety = 0;
+
+    while (
+        matches.length &&
+        safety < 100
+    ) {
+
+        matches.forEach(
+            cell => {
+
+                const type =
+                    GHOST_TYPES[
+                        Math.floor(
+                            Math.random() *
+                            GHOST_TYPES.length
+                        )
+                    ];
+
+                board[
+                    cell.row
+                ][
+                    cell.col
+                ] = {
+                    color: type.color,
+                    shape: type.shape
+                };
+            }
+        );
+
+        matches =
+            findMatches();
+
+        safety++;
+    }
+}
+
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+
+function renderBoard() {
+
+    boardElement.innerHTML = "";
+
+    for (
+        let row = 0;
+        row < ROWS;
+        row++
+    ) {
+
+        for (
+            let col = 0;
+            col < COLS;
+            col++
+        ) {
+
+            const tile =
+                document.createElement("div");
+
+            tile.className =
+                "tile";
+
+            tile.dataset.row =
+                row;
+
+            tile.dataset.col =
+                col;
+
+            const ghost =
+                createGhost(
+                    board[row][col].color,
+                    board[row][col].shape
+                );
+
+            tile.appendChild(
+                ghost
+            );
+
+            tile.addEventListener(
+                "click",
+                () => handleTileClick(
+                    row,
+                    col
+                )
+            );
+
+            tile.addEventListener(
+                "keydown",
+                event => {
+
+                    if (
+                        event.key ===
+                        "Enter" ||
+                        event.key ===
+                        " "
+                    ) {
+
+                        event.preventDefault();
+
+                        handleTileClick(
+                            row,
+                            col
+                        );
+                    }
+                }
+            );
+
+            tile.tabIndex = 0;
+
+            boardElement.appendChild(
+                tile
+            );
+        }
+    }
+
+    updateSelection();
+}
+
+
+/* =========================================================
+   SELECTION
+   ========================================================= */
+
+function updateSelection() {
+
+    document
+        .querySelectorAll(".tile")
+        .forEach(
+            tile => {
+
+                tile.classList.remove(
+                    "selected"
+                );
+
+            }
+        );
+
+    if (!selected) {
+        return;
+    }
+
+    const index =
+        selected.row * COLS +
+        selected.col;
+
+    const tile =
+        boardElement.children[index];
+
+    if (tile) {
+        tile.classList.add(
+            "selected"
+        );
+    }
+}
+
+
+function areAdjacent(
+    a,
+    b
+) {
+
+    return (
+        Math.abs(
+            a.row - b.row
+        ) +
+        Math.abs(
+            a.col - b.col
+        )
+    ) === 1;
+}
+
+
+/* =========================================================
+   TILE CLICK
+   ========================================================= */
+
+function handleTileClick(
+    row,
+    col
+) {
+
+    if (
+        busy ||
+        paused
+    ) {
+        return;
+    }
+
+    getAudioContext();
+
+    const clicked = {
+        row,
+        col
+    };
+
+
+    if (!selected) {
+
+        selected =
+            clicked;
+
+        updateSelection();
+
+        playTone(
+            320,
+            .08,
+            "sine",
+            .04
+        );
+
+        return;
+    }
+
+
+    if (
+        selected.row === row &&
+        selected.col === col
+    ) {
+
+        selected = null;
+
+        updateSelection();
+
+        return;
+    }
+
+
+    if (
+        areAdjacent(
+            selected,
+            clicked
+        )
+    ) {
+
+        swapTiles(
+            selected,
+            clicked
+        );
+
+        selected = null;
+
+        updateSelection();
+
+        processSwap();
+
+        return;
+    }
+
+
+    selected =
+        clicked;
+
+    updateSelection();
+
+    playTone(
+        350,
+        .08,
+        "sine",
+        .04
+    );
+}
+
+
+/* =========================================================
+   SWAP
+   ========================================================= */
+
+function swapTiles(
+    a,
+    b
+) {
+
+    const temp =
+        board[a.row][a.col];
+
+    board[a.row][a.col] =
+        board[b.row][b.col];
+
+    board[b.row][b.col] =
+        temp;
+
+    renderBoard();
+}
+
+
+/* =========================================================
+   MATCH DETECTION
+   Uses color + shape identity.
+   ========================================================= */
+
+function sameGhost(
+    a,
+    b
+) {
+
+    return (
+        a &&
+        b &&
+        a.color === b.color &&
+        a.shape === b.shape
+    );
+}
+
+
+function findMatches() {
+
+    const found = new Map();
+
+
+    /* Horizontal */
+
+    for (
+        let row = 0;
+        row < ROWS;
+        row++
+    ) {
+
+        let start = 0;
+
+        for (
+            let col = 1;
+            col <= COLS;
+            col++
+        ) {
+
+            const previous =
+                board[row][col - 1];
+
+            const current =
+                col < COLS
+                    ? board[row][col]
+                    : null;
+
+            if (
+                current &&
+                sameGhost(
+                    previous,
+                    current
+                )
+            ) {
+                continue;
+            }
+
+            const length =
+                col - start;
+
+            if (length >= 3) {
+
+                for (
+                    let c = start;
+                    c < col;
+                    c++
+                ) {
+
+                    found.set(
+                        `${row}-${c}`,
+                        {
+                            row,
+                            col: c
+                        }
+                    );
+                }
+            }
+
+            start = col;
+        }
+    }
+
+
+    /* Vertical */
+
+    for (
+        let col = 0;
+        col < COLS;
+        col++
+    ) {
+
+        let start = 0;
+
+        for (
+            let row = 1;
+            row <= ROWS;
+            row++
+        ) {
+
+            const previous =
+                board[row - 1][col];
+
+            const current =
+                row < ROWS
+                    ? board[row][col]
+                    : null;
+
+            if (
+                current &&
+                sameGhost(
+                    previous,
+                    current
+                )
+            ) {
+                continue;
+            }
+
+            const length =
+                row - start;
+
+            if (length >= 3) {
+
+                for (
+                    let r = start;
+                    r < row;
+                    r++
+                ) {
+
+                    found.set(
+                        `${r}-${col}`,
+                        {
+                            row: r,
+                            col
+                        }
+                    );
+                }
+            }
+
+            start = row;
+        }
+    }
+
+    return Array.from(
+        found.values()
+    );
+}
+
+
+/* =========================================================
+   PROCESS SWAP
+   ========================================================= */
+
+async function processSwap() {
+
+    busy = true;
+
+    const matches =
+        findMatches();
+
+
+    if (!matches.length) {
+
+        await wait(180);
+
+        /*
+         * Undo invalid swap.
+         */
+
+        const last =
+            getLastSwap();
+
+        if (last) {
+            swapTiles(
+                last.a,
+                last.b
+            );
+        }
+
+        busy = false;
+
+        return;
+    }
+
+
+    await resolveMatches();
+
+    busy = false;
+}
+
+
+/*
+ * This simple implementation keeps track of the
+ * most recent attempted swap.
+ */
+
+let lastSwap = null;
+
+
+function getLastSwap() {
+    return lastSwap;
+}
+
+
+/* =========================================================
+   OVERRIDE SWAP TRACKING
+   ========================================================= */
+
+const originalSwapTiles =
+    swapTiles;
+
+swapTiles = function(
+    a,
+    b
+) {
+
+    lastSwap = {
+        a: {...a},
+        b: {...b}
+    };
+
+    originalSwapTiles(
+        a,
+        b
+    );
+};
+
+
+/* =========================================================
+   RESOLVE MATCHES
+   ========================================================= */
+
+async function resolveMatches() {
+
+    let combo = 0;
+
+    while (true) {
+
+        const matches =
+            findMatches();
+
+        if (!matches.length) {
+            break;
+        }
+
+        combo++;
+
+        matches.forEach(
+            cell => {
+
+                const index =
+                    cell.row * COLS +
+                    cell.col;
+
+                const tile =
+                    boardElement
+                        .children[index];
+
+                if (tile) {
+                    tile.classList.add(
+                        "matched"
+                    );
+                }
+            }
+        );
+
+        playMatchSound(
+            Math.min(
+                matches.length,
+                6
+            )
+        );
+
+        score +=
+            matches.length *
+            10 *
+            combo;
+
+        connections++;
+
+        updateStats();
+
+        checkWinMilestone();
+
+        await wait(260);
+
+
+        /*
+         * Remove matches.
+         */
+
+        matches.forEach(
+            cell => {
+
+                board[
+                    cell.row
+                ][
+                    cell.col
+                ] = null;
+
+            }
+        );
+
+
+        /*
+         * Gravity.
+         */
+
+        for (
+            let col = 0;
+            col < COLS;
+            col++
+        ) {
+
+            const remaining = [];
+
+            for (
+                let row = ROWS - 1;
+                row >= 0;
+                row--
+            ) {
+
+                if (
+                    board[row][col]
+                ) {
+
+                    remaining.push(
+                        board[row][col]
+                    );
+
+                }
+            }
+
+            for (
+                let row = ROWS - 1;
+                row >= 0;
+                row--
+            ) {
+
+                const value =
+                    remaining[
+                        ROWS - 1 - row
+                    ];
+
+                board[row][col] =
+                    value || null;
+            }
+
+
+            /*
+             * Fill empty spaces.
+             */
+
+            for (
+                let row = 0;
+                row < ROWS;
+                row++
+            ) {
+
+                if (
+                    !board[row][col]
+                ) {
+
+                    board[row][col] =
+                        randomGhost();
+                }
+            }
+        }
+
+
+        renderBoard();
+
+        await wait(180);
+    }
+}
+
+
+/* =========================================================
+   RANDOM GHOST
+   ========================================================= */
+
+function randomGhost() {
+
+    const type =
+        GHOST_TYPES[
+            Math.floor(
+                Math.random() *
+                GHOST_TYPES.length
+            )
+        ];
+
+    return {
+        color: type.color,
+        shape: type.shape
+    };
+}
+
+
+/* =========================================================
+   WIN MILESTONES
+   ========================================================= */
+
+function checkWinMilestone() {
+
+    if (
+        connections >= KID_WIN_GOAL &&
+        !kidWinShown
+    ) {
+
+        showWinCard(
+            connections
+        );
+
+        return;
+    }
+
+
+    if (
+        connections >= PRO_WIN_GOAL &&
+        !proWinShown
+    ) {
+
+        showWinCard(
+            connections
+        );
+    }
+}
+
+
+function showWinCard(
+    amount
+) {
+
+    paused = true;
+
+    finalConnections.textContent =
+        amount;
+
+
+    if (
+        amount >= PRO_WIN_GOAL
+    ) {
+
+        winTitle.textContent =
+            "YOU WIN!";
+
+        winSubtitle.textContent =
+            "PRO GHOST MASTER!";
+
+        winMessage.textContent =
+            "WOW! You made 15 ghost connections!";
+
+        winBadge.textContent =
+            "👻 ⭐ PRO GHOST MASTER ⭐ 👻";
+
+        proWinShown = true;
+
+    } else {
+
+        winTitle.textContent =
+            "YOU WIN!";
+
+        winSubtitle.textContent =
+            "Amazing Job!";
+
+        winMessage.textContent =
+            "You made 10 ghost connections!";
+
+        winBadge.textContent =
+            "👻 GHOST MASTER 👻";
+
+        kidWinShown = true;
+    }
+
+
+    winOverlay.classList.add(
+        "show"
+    );
+
+    playWinSound();
+}
+
+
+/* =========================================================
+   STATS
+   ========================================================= */
+
+function updateStats() {
+
+    scoreElement.textContent =
+        score;
+
+    connectionsElement.textContent =
+        connections;
+
+    if (
+        connections > best
+    ) {
+
+        best =
+            connections;
+
+        localStorage.setItem(
+            "ghostBest",
+            best
+        );
+    }
+
+    bestElement.textContent =
+        best;
+}
+
+
+/* =========================================================
+   NEW GAME
+   ========================================================= */
+
+function startNewGame() {
+
+    paused = false;
+    busy = false;
+
+    selected = null;
+
+    score = 0;
+    connections = 0;
+
+    kidWinShown = false;
+    proWinShown = false;
+
+    winOverlay.classList.remove(
+        "show"
+    );
+
+    generateBoard();
+
+    renderBoard();
+
+    updateStats();
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+newGameButton.addEventListener(
+    "click",
+    () => {
+
+        getAudioContext();
+
+        startNewGame();
+
+    }
+);
+
+
+newGameWinButton.addEventListener(
+    "click",
+    () => {
+
+        getAudioContext();
+
+        startNewGame();
+
+    }
+);
+
+
+continueButton.addEventListener(
+    "click",
+    () => {
+
+        winOverlay.classList.remove(
+            "show"
+        );
+
+        paused = false;
+
+    }
+);
+
+
+soundButton.addEventListener(
+    "click",
+    () => {
+
+        soundEnabled =
+            !soundEnabled;
+
+        soundButton.textContent =
+            soundEnabled
+                ? "🔊 Sound On"
+                : "🔇 Sound Off";
+
+        if (soundEnabled) {
+
+            getAudioContext();
+
+            playTone(
+                500,
+                .12,
+                "sine",
+                .08
+            );
+        }
+    }
+);
+
+
+musicButton.addEventListener(
+    "click",
+    () => {
+
+        musicEnabled =
+            !musicEnabled;
+
+        musicButton.textContent =
+            musicEnabled
+                ? "🎵 Music On"
+                : "🎵 Music Off";
+
+
+        if (musicEnabled) {
+
+            getAudioContext();
+
+            startMusic();
+
+        } else {
+
+            stopMusic();
+
+        }
+    }
+);
+
+
+/* =========================================================
+   UTILITY
+   ========================================================= */
+
+function wait(ms) {
+
+    return new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                ms
+            )
+    );
+}
+
+
+/* =========================================================
+   START GAME
+   ========================================================= */
+
+startNewGame();
+
+scheduleLightning();
+
+scheduleJumpscare();
+
+
+/*
+ * Browsers require a user interaction before allowing
+ * Web Audio to play. Start the Halloween music on the
+ * first interaction.
+ */
+
+let audioStarted = false;
+
+document.addEventListener(
+    "pointerdown",
+    () => {
+
+        if (!audioStarted) {
+
+            audioStarted = true;
+
+            getAudioContext();
+
+            if (musicEnabled) {
+                startMusic();
+            }
+        }
+
+    },
+    {
+        once: true
+    }
+);
+
+
+/* =========================================================
+   PWA: SERVICE WORKER REGISTRATION
+   ========================================================= */
+
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener(
+        "load",
+        () => {
+
+            navigator.serviceWorker
+                .register("serviceworker.js")
+                .catch(() => {
+                    /* offline install still works without this */
+                });
+
+        }
+    );
+}
+
+</script>
+
+</body>
+</html>
