@@ -1,0 +1,13 @@
+{
+  "appId": "link.parkerdata.ghostmatch",
+  "appName": "Ghost Match",
+  "webDir": "www",
+  "server": {
+    "url": "https://ghost-match.pages.dev/?app=1",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#11101d"
+  }
+}
