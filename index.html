@@ -23,7 +23,18 @@
 <title>Ghost Match</title>
 
 <!-- Google AdSense (Auto ads) -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2328685696786328" crossorigin="anonymous"></script>
+<script>
+/* AdSense runs on the web only. Inside the Android app (window.GameAds
+   is injected by the native shell) ads come from the AdMob SDK instead,
+   because AdSense may not be shown inside a WebView. */
+if (!window.GameAds) {
+    var s = document.createElement("script");
+    s.async = true;
+    s.crossOrigin = "anonymous";
+    s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2328685696786328";
+    document.head.appendChild(s);
+}
+</script>
 
 <style>
 
@@ -3303,6 +3314,12 @@ function showWinCard(
     );
 
     playWinSound();
+
+    /* Android app: tell the native shell the round is over so it can
+       show an interstitial (every third win) — never mid-game. */
+    if (window.GameAds && window.GameAds.roundEnded) {
+        try { window.GameAds.roundEnded(); } catch (e) {}
+    }
 }
 
 
