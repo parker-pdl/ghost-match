@@ -1,4 +1,4 @@
-const CACHE_NAME = "ghost-match-v2";
+const CACHE_NAME = "ghost-match-v3";
 
 const FILES_TO_CACHE = [
   "./",
